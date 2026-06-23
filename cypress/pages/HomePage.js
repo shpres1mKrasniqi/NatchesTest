@@ -16,6 +16,13 @@ class HomePage {
       .and("not.be.disabled")
       .click();
   }
+
+  // openRegister() {
+  //   cy.get(".btn.btn-primary.account-menu-login-button")
+  //     .should("be.visible")
+  //     .and("not.be.disabled")
+  //     .click();
+  // }
 }
 
 export default new HomePage();

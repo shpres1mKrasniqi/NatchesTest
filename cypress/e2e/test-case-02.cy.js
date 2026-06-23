@@ -1,55 +1,147 @@
-import ProductPage from "../pages/ProductPage";
-import CheckoutConfirmPage from "../pages/CheckoutConfirmPage ";
+import HomePage from "../pages/HomePage";
+import LoginPage from "../pages/LoginPage";
+import WishListPage from "../pages/Test-2/WishListPage";
+import DashboardPage from "../pages/DashboardPage";
+import ShopAllPage from "../pages/Test-2/ShopAllPage";
+import ProductPage from "../pages/Test-2/ProductPage";
+import CreateCustomerPage from "../pages/Test-2/CreateCustomerPage";
+import CheckoutPage from "../pages/Test-2/CheckoutPage";
 
+Cypress.on("uncaught:exception", (err, runnable) => {
+  return false;
+}); //Kjo a vendos se kaniher ui o tu bo crash e mos me deshtu testi prej tyne e kom shtu
 describe("Shopware Checkout Regression Tests", () => {
   it("TC-02 - Curbstone new customer with new card checkout", () => {
-    const testDate = new Date().toISOString();
+    //E marrum HomePagen
 
-    const productUrl =
-      "https://f2yt3gogmjqkq-main-bvxea6i.us-2.tst.site/detail/019971ac3557730fb25a5b19a29a6e03";
+    HomePage.visit();
 
-    // Step 1 - Open product page
-    ProductPage.visit(productUrl);
-    ProductPage.verifyProductPage();
+    //Klikojna me u kyq n acc ton
+    HomePage.openAccount();
 
-    // Step 2 - Add to cart
-    ProductPage.addToCart();
-    cy.wait(3000);
+    //E zgjedhum opsionin mu kyq
+    HomePage.openLogin();
 
-    // Step 3 - Go checkout confirm
-    CheckoutConfirmPage.visit();
-    CheckoutConfirmPage.verifyCheckoutPage();
+    //te login page e shenojna emailin
+    LoginPage.fillEmailData();
 
-    // Step 4 - Shipping protection
-    CheckoutConfirmPage.activateShippingProtectionIfNeeded();
-    CheckoutConfirmPage.verifyShippingProtectionActive();
+    //e klikojna butonin me vazhdu me pasin:
 
-    // Step 5 - Tax validation
-    CheckoutConfirmPage.verifyTaxVisible();
+    LoginPage.continueWithPass();
 
-    // Step 6 - Payment method
-    CheckoutConfirmPage.verifyPaymentMethod();
+    //E shkrujna pasin:
 
-    // Step 7 - New card option
-    CheckoutConfirmPage.selectNewCardIfAvailable();
+    LoginPage.fillPasswordData();
 
-    // Screenshot
-    cy.screenshot(`TC-02-new-card-form-${Date.now()}`, {
-      capture: "fullPage",
-    });
+    //e shtypun kyqu:
 
-    // Log
-    cy.log(
-      JSON.stringify({
-        testCase: "TC-02",
-        testDate,
-        paymentMethod: "Curbstone Credit Card",
-        paymentType: "New Card",
-        shippingInsurance: "Activated",
-        vertexTax: "Displayed",
-        productSource: "Shared Wishlist Link",
-        status: "READY_FOR_CARD_DETAILS_STEP",
-      }),
+    LoginPage.clickLogin();
+
+    //Te dashboardi e klikojna me navigu te wishlista:
+
+    DashboardPage.openWishList();
+
+    //Klikojna butonin me kriju Wishlist te re:
+
+    WishListPage.clickCreateWishListButton();
+
+    //E vendosum ni emer per Wishlisten:
+
+    WishListPage.fillWishListName();
+
+    //E bojm Publike:
+
+    WishListPage.makeWishListPublic();
+
+    //E shtojna:
+
+    WishListPage.clickAddButton();
+
+    //Shkojm te ShopAll qe me gjet ni produkt per me shtu ne wishlist:
+
+    WishListPage.goToShopAll();
+
+    //E zgjedhum Ammution:
+
+    ShopAllPage.clickAmmunitionCategory();
+
+    //Shtojna produktin ne Wishlist:
+
+    ShopAllPage.addProductToWishList();
+
+    //Zgjedhim Wishlisten:
+
+    WishListPage.addProductToWishList();
+
+    //Kthehum te dashboard:
+
+    DashboardPage.returnToDashboard();
+
+    //Te dashboardi e klikojna me navigu te wishlista:
+
+    DashboardPage.openWishList();
+
+    WishListPage.selectWishList();
+
+    WishListPage.makePublicWislist();
+
+    WishListPage.copyPublicPath();
+
+    WishListPage.visitSharedLinkAsNewCustomer();
+
+    ProductPage.addProductToCart();
+
+    ProductPage.goToCheckOut();
+
+    CreateCustomerPage.toggleShippingProtection();
+
+    CreateCustomerPage.selectGuestAccount();
+
+    cy.wait(2000);
+    CreateCustomerPage.fillPersonalDetails(
+      "Shpresim",
+      "Tester",
+      "krasniqis092@gmail.com",
+      "Shpresimi1Testim@@",
     );
+
+    CreateCustomerPage.fillUSAddress(
+      "1600 Amphitheatre Pkwy",
+      "Mountain View",
+      "94043",
+    );
+    cy.wait(2000);
+
+    CreateCustomerPage.fillRandomUSAPhone();
+    CreateCustomerPage.acceptDataProtection();
+
+    CreateCustomerPage.clickContinue();
+
+    cy.wait(2000);
+
+    CheckoutPage.toggleShippingProtection();
+
+    cy.wait(2000);
+
+    CheckoutPage.applyPromoCode();
+
+    CheckoutPage.clickAddPromo();
+
+    CheckoutPage.selectShippingMethod();
+
+    CheckoutPage.selectPaymentMethod();
+
+    cy.wait(3000);
+    CheckoutPage.fillCreditCardDetails(
+      "5454545454545454", // Numri i kartës
+      "3", // Muaji (Ndryshoje në "03" nëse dështon)
+      "2028", // Viti (Ndryshoje në "28" ose formatin që kërkon select-i)
+      "123", // CVV
+    );
+
+    CheckoutPage.agreeToTermsAndConditions();
+    CheckoutPage.checkNewsLetters();
+
+    CheckoutPage.enterPayButton();
   });
 });

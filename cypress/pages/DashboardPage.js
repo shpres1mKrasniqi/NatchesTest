@@ -7,6 +7,10 @@ class DashboardPage {
       .and("be.visible")
       .click();
   }
+
+  returnToDashboard() {
+    cy.visit("https://f2yt3gogmjqkq-main-bvxea6i.us-2.tst.site/account");
+  }
 }
 
 export default new DashboardPage();
